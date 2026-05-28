@@ -53,14 +53,29 @@ L’administrateur est responsable de la gestion et du bon fonctionnement de la 
 
 ## 3. Description des technologies utilisées
 
-Pour développer ProjectMatch, les technologies suivantes seront utilisées :
+Pour développer ProjectMatch, les technologies suivantes sont utilisées:
 
-- **Spring Boot (Java)** : pour créer le backend, gérer la logique métier, les API REST et la communication avec la base de données.
+### 🖥️ Frontend
+ 
+- **React** : utilisé pour développer une interface utilisateur moderne, dynamique et réactive.
 
-- **HTML, CSS et Bootstrap** : pour construire les pages web, créer une interface utilisateur responsive et attractive.
+- **Axios** : Bibliothèque HTTP pour la communication entre le frontend et les API REST des services backend.
 
-- **JavaScript** : pour rendre le frontend interactif et gérer des fonctionnalités dynamiques.
+- **STOMP.js et SockJS** : Bibliothèques JavaScript utilisées pour la communication en temps réel et le système de messagerie instantanée via WebSocket.
 
-- **MySQL** : pour stocker les informations sur les utilisateurs, les projets, les équipes et les notifications.
+- **CSS3** : Styles personnalisés pour une interface moderne et responsive (design inspiré de LinkedIn/WhatsApp).
 
-Ces technologies permettent de créer une plateforme moderne, stable et facile à maintenir, tout en offrant une bonne expérience utilisateur et en facilitant la collaboration entre jeunes, mentors et administrateurs.
+### ⚙️ Backend
+
+- **Spring Boot** : utilisé pour développer les microservices backend, gérer la logique métier et créer les API REST.
+
+- **Spring Security** : utilisé pour sécuriser l’application et gérer l’authentification avec JWT.
+
+- **Hibernate / JPA** : utilisé pour la gestion et la persistance des données.
+
+- **JJWT** : utilisé pour la génération et la validation des tokens JWT.
+
+### 🗄️ Base de données
+**MySQL**: utilisé pour stocker les informations des utilisateurs, projets, équipes, messages et formations.
+
+Ces technologies forment une architecture **client-serveur moderne** : React assure une interface dynamique, Spring Boot expose des API REST sécurisées, et MySQL garantit la persistance des données. La communication temps réel via WebSocket (STOMP + SockJS) enrichit l'expérience collaborative de la plateforme.

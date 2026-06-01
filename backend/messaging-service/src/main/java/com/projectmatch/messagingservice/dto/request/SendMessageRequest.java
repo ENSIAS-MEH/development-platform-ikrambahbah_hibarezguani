@@ -15,5 +15,5 @@ import java.util.List;
 public class SendMessageRequest {
     private Long conversationId;
     private String content;
-    private List<String> attachmentUrls; // optionnel
+    private List<String> attachmentUrls;
 }

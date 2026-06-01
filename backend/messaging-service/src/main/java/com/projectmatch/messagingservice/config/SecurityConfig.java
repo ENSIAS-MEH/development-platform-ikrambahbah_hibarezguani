@@ -34,6 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/ws-messaging/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
                         // ✅ Endpoint pour vérifier le statut des utilisateurs
                         .requestMatchers(HttpMethod.GET, "/api/users/**").authenticated()
                         .anyRequest().authenticated()

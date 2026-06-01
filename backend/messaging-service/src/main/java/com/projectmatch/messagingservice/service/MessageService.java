@@ -23,6 +23,7 @@ public class MessageService {
     private final ConversationRepository    conversationRepository;
     private final ParticipantRepository     participantRepository;
     private final SimpMessagingTemplate     messagingTemplate;
+    private final FileStorageService fileStorageService;
 
     // ─────────────────────────────────────────────────────────────────
     // ENVOYER UN MESSAGE
@@ -240,5 +241,41 @@ public class MessageService {
                 .sentAt(msg.getSentAt())
                 .attachmentUrls(attachmentUrls)
                 .build();
+    }
+// ─────────────────────────────────────────────────────────────────
+// SUPPRIMER UN MESSAGE (soft delete)
+// ─────────────────────────────────────────────────────────────────
+
+    @Transactional
+    public void deleteMessage(Long messageId, Long userId) {
+        Message msg = messageRepository.findById(messageId)
+                .orElseThrow(() -> new RuntimeException("Message introuvable : " + messageId));
+
+        if (!msg.getSenderId().equals(userId)) {
+            throw new RuntimeException("Vous ne pouvez supprimer que vos propres messages");
+        }
+
+        if (msg.getStatus() == MessageStatus.DELETED) {
+            throw new RuntimeException("Ce message est déjà supprimé");
+        }
+
+        // ✅ Récupérer et supprimer les pièces jointes
+        List<MessageAttachment> attachments = attachmentRepository.findByMessageId(messageId);
+        List<String> attachmentUrls = attachments.stream()
+                .map(MessageAttachment::getFileUrl)
+                .collect(Collectors.toList());
+
+        if (!attachmentUrls.isEmpty()) {
+            fileStorageService.deleteFiles(attachmentUrls);
+            attachmentRepository.deleteAll(attachments);
+        }
+
+        // Soft delete du message
+        msg.setStatus(MessageStatus.DELETED);
+        msg.setContent(null);
+        messageRepository.save(msg);
+
+        // Broadcast
+        broadcastStatusUpdate(msg.getConversationId(), messageId, MessageStatus.DELETED);
     }
 }

@@ -51,10 +51,6 @@ public class MessageController {
         return ResponseEntity.ok().build();
     }
 
-    /**
-     * ✅ NOUVEAU ENDPOINT : Marque TOUS les messages comme DELIVERED
-     * Appelé immédiatement après la connexion WebSocket
-     */
     @PostMapping("/delivered/all")
     public ResponseEntity<Void> markAllDelivered(HttpServletRequest http) {
         Long userId = (Long) http.getAttribute("userId");
@@ -77,6 +73,16 @@ public class MessageController {
             HttpServletRequest http) {
         Long userId = (Long) http.getAttribute("userId");
         messageService.markAsRead(messageId, userId);
+        return ResponseEntity.ok().build();
+    }
+
+    // ✅ NOUVEAU : Supprimer un message (soft delete)
+    @DeleteMapping("/{messageId}")
+    public ResponseEntity<Void> deleteMessage(
+            @PathVariable Long messageId,
+            HttpServletRequest http) {
+        Long userId = (Long) http.getAttribute("userId");
+        messageService.deleteMessage(messageId, userId);
         return ResponseEntity.ok().build();
     }
 

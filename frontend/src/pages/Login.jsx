@@ -13,7 +13,7 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
   const { loginUser } = useAuth();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // conservez si besoin mais on ne l'utilise plus pour la redirection
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -29,9 +29,10 @@ function Login() {
       setMessageType("success");
       setMessage("Connexion réussie ✅ Redirection en cours...");
 
-      setTimeout(() => {
-        navigate("/projects"); // route qui existe dans App.js
-      }, 1200);
+      // ✅ Plus de navigate manuel : la redirection se fait via PublicRoute dans App.js
+      // Le setTimeout n'est pas nécessaire ; on laisse le temps au contexte de se mettre à jour.
+      // Pour un meilleur UX, on peut garder le message puis la redirection sera automatique.
+      // Le navigate est supprimé.
 
     } catch (error) {
       setMessageType("error");

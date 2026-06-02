@@ -15,7 +15,7 @@
     <groupId>com.projectmatch</groupId>
     <artifactId>projectmatch-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>pom</packaging>   <!-- IMPORTANT : pom et non jar -->
+    <packaging>pom</packaging>
     <name>ProjectMatch</name>
 
     <properties>
@@ -29,6 +29,7 @@
         <module>project-service</module>
         <module>profile-service</module>
         <module>messaging-service</module>
+        <module>training-service</module>
     </modules>
 
     <!-- Dépendances communes à tous les services -->

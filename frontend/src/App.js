@@ -20,6 +20,16 @@ import ManageSkillsPage from "./pages/ManageSkillsPage";
 import ManageExperiencePage from "./pages/ManageExperiencePage";
 import ManageEducationPage from "./pages/ManageEducationPage";
 
+// Import des pages training (student)
+import TrainingsListPage from "./pages/student/TrainingsListPage";
+import TrainingDetailPage from "./pages/student/TrainingDetailPage";
+import MyLearningsPage from "./pages/student/MyLearningsPage";
+
+// Import des pages training (mentor)
+import MentorTrainingsPage from "./pages/mentor/MentorTrainingsPage";
+import MentorResourcesPage from "./pages/mentor/MentorResourcesPage";
+
+
 // Importer la page 403 (accès refusé)
 import ForbiddenPage from "./pages/ForbiddenPage";
 
@@ -43,6 +53,14 @@ function StudentRoute({ children }) {
   
   return children;
 }
+// Route privée pour les mentors uniquement
+function MentorRoute({ children }) {
+  const { isAuthenticated, loading, user } = useAuth();
+  if (loading) return null;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (user?.role !== "MENTOR") return <Navigate to="/forbidden" replace />;
+  return children;
+}
 
 // Route privée standard (tous les utilisateurs connectés)
 function PrivateRoute({ children }) {
@@ -58,6 +76,9 @@ function PublicRoute({ children }) {
   
   if (isAuthenticated && user?.role === "STUDENT") {
     return <Navigate to="/projects" replace />;
+  }
+  if (isAuthenticated && user?.role === "MENTOR") {
+    return <Navigate to="/mentor/trainings" replace />;
   }
   if (isAuthenticated) {
     return <Navigate to="/profile" replace />;
@@ -98,6 +119,15 @@ function AppRoutes() {
         <Route path="/conversations" element={<PrivateRoute><ConversationsPage /></PrivateRoute>} />
         <Route path="/conversations/:id" element={<PrivateRoute><ConversationDetail /></PrivateRoute>} />
         
+        {/* ========== ROUTES TRAINING (ÉTUDIANT) ========== */}
+        <Route path="/trainings" element={<StudentRoute><TrainingsListPage /></StudentRoute>} />
+        <Route path="/trainings/:trainingId" element={<StudentRoute><TrainingDetailPage /></StudentRoute>} />
+        <Route path="/my-learnings" element={<StudentRoute><MyLearningsPage /></StudentRoute>} />
+
+        {/* ========== ROUTES TRAINING (MENTOR) ========== */}
+        <Route path="/mentor/trainings" element={<MentorRoute><MentorTrainingsPage /></MentorRoute>} />
+        <Route path="/mentor/trainings/:trainingId/resources" element={<MentorRoute><MentorResourcesPage /></MentorRoute>} />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>

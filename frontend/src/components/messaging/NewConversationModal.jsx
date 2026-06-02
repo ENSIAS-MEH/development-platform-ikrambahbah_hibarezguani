@@ -24,6 +24,10 @@ export default function NewConversationModal({ isOpen, onClose, onSuccess }) {
   const currentUserId = parseInt(localStorage.getItem("userId"));
   const navigate = useNavigate();
 
+  // ✅ Récupérer le rôle de l'utilisateur connecté
+  const userRole = localStorage.getItem("role");
+  const isMentor = userRole === "MENTOR";
+
   const loadExistingConversations = useCallback(async () => {
     try {
       const res = await getConversations();
@@ -34,6 +38,8 @@ export default function NewConversationModal({ isOpen, onClose, onSuccess }) {
   }, []);
 
   const loadProjects = useCallback(async () => {
+    // Ne pas charger les projets si l'utilisateur est mentor (option non affichée)
+    if (isMentor) return;
     setLoadingProjects(true);
     try {
       const res = await getMyProjects();
@@ -44,7 +50,7 @@ export default function NewConversationModal({ isOpen, onClose, onSuccess }) {
     } finally {
       setLoadingProjects(false);
     }
-  }, []);
+  }, [isMentor]);
 
   const loadStudents = useCallback(async () => {
     setLoading(true);
@@ -168,7 +174,7 @@ export default function NewConversationModal({ isOpen, onClose, onSuccess }) {
     }
   };
 
-  // Pour PROJECT_TEAM : sélectionner un projet
+  // Pour PROJECT_TEAM : sélectionner un projet (uniquement pour étudiants)
   const handleProjectSelect = async (projectId) => {
     setSelectedProjectId(projectId);
     const memberIds = await loadProjectMembers(projectId);
@@ -241,7 +247,6 @@ export default function NewConversationModal({ isOpen, onClose, onSuccess }) {
         return;
       }
       
-      // ✅ Vérifier si une conversation de groupe existe déjà
       const existing = findExistingGroupConversation(selectedUsers, conversationName.trim());
       if (existing) {
         onClose();
@@ -338,7 +343,7 @@ export default function NewConversationModal({ isOpen, onClose, onSuccess }) {
         </div>
 
         <div className="modal-body">
-          {/* Type */}
+          {/* Type de conversation - masquer "Équipe projet" pour les mentors */}
           <div className="form-group">
             <label>Type de conversation</label>
             <select
@@ -352,12 +357,14 @@ export default function NewConversationModal({ isOpen, onClose, onSuccess }) {
             >
               <option value="DIRECT">👤 Directe (1-1)</option>
               <option value="GROUP">👥 Groupe</option>
-              <option value="PROJECT_TEAM">📁 Équipe projet</option>
+              {!isMentor && (
+                <option value="PROJECT_TEAM">📁 Équipe projet</option>
+              )}
             </select>
           </div>
 
-          {/* Pour PROJECT_TEAM : sélection du projet */}
-          {conversationType === "PROJECT_TEAM" && (
+          {/* Pour PROJECT_TEAM : sélection du projet (uniquement pour étudiants) */}
+          {conversationType === "PROJECT_TEAM" && !isMentor && (
             <div className="form-group">
               <label>Sélectionner un projet</label>
               <select
@@ -467,8 +474,8 @@ export default function NewConversationModal({ isOpen, onClose, onSuccess }) {
             </div>
           )}
 
-          {/* ✅ Info pour PROJECT_TEAM - avec noms complets et indication (moi) */}
-          {conversationType === "PROJECT_TEAM" && selectedProjectId && (
+          {/* Info pour PROJECT_TEAM - uniquement pour étudiants */}
+          {conversationType === "PROJECT_TEAM" && !isMentor && selectedProjectId && (
             <div className="selected-users">
               <label>Participants (membres du projet) :</label>
               <div className="selected-users-tags">

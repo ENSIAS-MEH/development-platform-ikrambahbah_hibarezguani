@@ -1,9 +1,9 @@
+// src/pages/projects/MyRequestsPage.jsx
 import { useEffect, useState } from "react";
 import { getMyRequests } from "../../services/projectApi";
-import { getMultipleUsers } from "../../services/userApi";
+import { getMultipleUsers } from "../../services/authService";
 import { useNavigate } from "react-router-dom";
 import "./Projects.css";
-
 export default function MyRequestsPage() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);

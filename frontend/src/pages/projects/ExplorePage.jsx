@@ -1,6 +1,7 @@
+// src/pages/projects/ExplorePage.jsx
 import { useEffect, useState } from "react";
 import { getPublishedProjects } from "../../services/projectApi";
-import { getMultipleUsers } from "../../services/userApi";
+import { getMultipleUsers } from "../../services/authService";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import CreateProjectModal from "../../components/projects/CreateProjectModal";

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getJoinRequests, approveRequest, rejectRequest } from "../../services/projectApi";
-import { getMultipleUsers } from "../../services/userApi";
+import { getMultipleUsers } from "../../services/authService";
 
 export default function JoinRequestsList({ projectId, onRequestChange }) {
   const [requests, setRequests] = useState([]);

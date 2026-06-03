@@ -1,10 +1,12 @@
+// src/services/authService.js
 import axios from "axios";
 
-const AUTH_URL = "http://localhost:8084/api/auth";
+const API_GATEWAY_URL = "http://localhost:8080";
 
 // ─── Instance Axios avec intercepteur JWT ──────────────────────────────────
-// Utilise cette instance pour tous les appels aux services protégés
-export const apiClient = axios.create();
+export const apiClient = axios.create({
+  baseURL: API_GATEWAY_URL
+});
 
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
@@ -14,31 +16,54 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Intercepteur réponse : déconnecte si token expiré (401)
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
+  (error) => {  // ← ICI : ajouter "=>"
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("role");
+      localStorage.removeItem("userId");
       window.location.href = "/login";
     }
     return Promise.reject(error);
   }
 );
 
-// ─── Auth endpoints ────────────────────────────────────────────────────────
-export const login = (data) => axios.post(`${AUTH_URL}/login`, data);
-
-export const register = (data) => axios.post(`${AUTH_URL}/register`, data);
-
-export const forgotPassword = (email) =>
-  axios.post(`${AUTH_URL}/forgot-password`, { email });
-
-export const resetPassword = (data) =>
-  axios.post(`${AUTH_URL}/reset-password`, data);
+// ─── Auth endpoints (via Gateway) ────────────────────────────────────────
+export const login = (data) => axios.post(`${API_GATEWAY_URL}/api/auth/login`, data);
+export const register = (data) => axios.post(`${API_GATEWAY_URL}/api/auth/register`, data);
+export const forgotPassword = (email) => axios.post(`${API_GATEWAY_URL}/api/auth/forgot-password`, { email });
+export const resetPassword = (data) => axios.post(`${API_GATEWAY_URL}/api/auth/reset-password`, data);
 
 export const getAllStudents = async () => {
-  const response = await apiClient.get(`${AUTH_URL}/students`);
+  const response = await apiClient.get(`/api/auth/students`);
   return response.data;
+};
+
+// Récupérer les infos d'un utilisateur par son ID
+export const getUserInfo = async (userId) => {
+  try {
+    const response = await apiClient.get(`/api/auth/users/${userId}`);
+    return response;
+  } catch (error) {
+    console.error(`Erreur chargement user ${userId}:`, error);
+    return { data: { email: `user${userId}` } };
+  }
+};
+
+// Récupérer plusieurs utilisateurs en une fois
+export const getMultipleUsers = async (userIds) => {
+  if (!userIds || userIds.length === 0) return {};
+  
+  const uniqueIds = [...new Set(userIds)];
+  const promises = uniqueIds.map(id => 
+    getUserInfo(id).catch(() => ({ data: { email: `Utilisateur ${id}` } }))
+  );
+  const results = await Promise.all(promises);
+  const usersMap = {};
+  uniqueIds.forEach((id, index) => {
+    const email = results[index].data.email;
+    usersMap[id] = email.split('@')[0];
+  });
+  return usersMap;
 };

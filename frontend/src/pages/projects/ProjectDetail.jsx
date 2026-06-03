@@ -1,3 +1,4 @@
+// src/pages/projects/ProjectDetail.jsx
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { 
@@ -9,7 +10,7 @@ import {
   getMembers,
   removeMember
 } from "../../services/projectApi";
-import { getUserInfo, getMultipleUsers } from "../../services/userApi";
+import { getUserInfo, getMultipleUsers } from "../../services/authService";
 import { useAuth } from "../../context/AuthContext";
 import "./Projects.css";
 

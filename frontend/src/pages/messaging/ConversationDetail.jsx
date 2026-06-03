@@ -9,7 +9,7 @@ import {
   markConversationAsRead,
 } from "../../services/messagingApi";
 import { getMultipleProfiles, getProfileByUserId } from "../../services/profileService";
-import { getUserInfo } from "../../services/userApi";
+import { getUserInfo } from "../../services/authService";
 import { useWebSocketContext } from "../../context/WebSocketContext";
 import { useAuth } from "../../context/AuthContext";
 import { useUserStatus } from "../../hooks/useUserStatus";

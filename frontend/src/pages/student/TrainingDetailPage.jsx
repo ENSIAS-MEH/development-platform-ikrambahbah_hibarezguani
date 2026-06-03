@@ -1,11 +1,8 @@
 // src/pages/student/TrainingDetailPage.jsx
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
-import PaymentModal from "./PaymentModal";   // ← NOUVEAU
-
-const API_URL = "http://localhost:8087/api/trainings";
-const PROFILE_API = "http://localhost:8082/api/profiles";
+import { apiClient } from "../../services/authService";
+import PaymentModal from "./PaymentModal";
 
 function TrainingDetailPage() {
   const { trainingId } = useParams();
@@ -21,13 +18,8 @@ function TrainingDetailPage() {
   const [stats, setStats] = useState({ averageRating: 0, totalReviews: 0 });
   const [activeTab, setActiveTab] = useState("overview");
   const [resources, setResources] = useState([]);
-
-  // ── NOUVEAU : état du modal de paiement ──
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
-  const getAuthHeader = () => ({
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  });
 
   useEffect(() => {
     fetchProfile();
@@ -39,7 +31,7 @@ function TrainingDetailPage() {
 
   const fetchProfile = async () => {
     try {
-      const response = await axios.get(`${PROFILE_API}/me`, { headers: getAuthHeader() });
+      const response = await apiClient.get(`/api/profiles/me`);
       setProfile(response.data);
     } catch (error) {
       console.error("Profile error:", error);
@@ -48,7 +40,7 @@ function TrainingDetailPage() {
 
   const fetchTraining = async () => {
     try {
-      const res = await axios.get(`${API_URL}/${trainingId}`, { headers: getAuthHeader() });
+      const res = await apiClient.get(`/api/trainings/${trainingId}`);
       setTraining(res.data);
     } catch (err) {
       console.error("Error fetching training:", err);
@@ -57,7 +49,7 @@ function TrainingDetailPage() {
 
   const fetchResources = async () => {
     try {
-      const res = await axios.get(`${API_URL}/${trainingId}/resources`, { headers: getAuthHeader() });
+      const res = await apiClient.get(`/api/trainings/${trainingId}/resources`);
       setResources(res.data);
     } catch (err) {
       console.error("Error fetching resources:", err);
@@ -67,7 +59,7 @@ function TrainingDetailPage() {
 
   const checkEnrollment = async () => {
     try {
-      const res = await axios.get(`${API_URL}/my-enrollments`, { headers: getAuthHeader() });
+      const res = await apiClient.get(`/api/trainings/my-enrollments`);
       setIsEnrolled(res.data.some((e) => e.id === parseInt(trainingId)));
     } catch (err) {
       console.error("Error checking enrollment:", err);
@@ -76,7 +68,7 @@ function TrainingDetailPage() {
 
   const fetchReviews = async () => {
     try {
-      const res = await axios.get(`${API_URL}/${trainingId}/reviews`, { headers: getAuthHeader() });
+      const res = await apiClient.get(`/api/trainings/${trainingId}/reviews`);
       setReviews(res.data);
       if (res.data.length > 0) {
         const avg = res.data.reduce((sum, r) => sum + r.rating, 0) / res.data.length;
@@ -89,22 +81,17 @@ function TrainingDetailPage() {
     }
   };
 
-  // ── NOUVEAU : gestion de l'inscription ──
   const handleEnroll = async () => {
     if (!training) return;
-
-    // Déjà inscrit → ne rien faire
     if (isEnrolled) return;
 
-    // Formation PAYANTE → ouvrir le modal de paiement
     if (training.type === "PAID") {
       setShowPaymentModal(true);
       return;
     }
 
-    // Formation GRATUITE → inscription directe
     try {
-      await axios.post(`${API_URL}/${trainingId}/enroll`, {}, { headers: getAuthHeader() });
+      await apiClient.post(`/api/trainings/${trainingId}/enroll`, {});
       setIsEnrolled(true);
       alert("✅ Inscription réussie ! Vous pouvez maintenant accéder aux ressources.");
     } catch (err) {
@@ -112,7 +99,6 @@ function TrainingDetailPage() {
     }
   };
 
-  // ── NOUVEAU : callback appelé après paiement accepté ──
   const handlePaymentSuccess = (transactionId) => {
     setShowPaymentModal(false);
     setIsEnrolled(true);
@@ -124,7 +110,7 @@ function TrainingDetailPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await axios.post(`${API_URL}/${trainingId}/reviews`, reviewForm, { headers: getAuthHeader() });
+      await apiClient.post(`/api/trainings/${trainingId}/reviews`, reviewForm);
       await fetchReviews();
       setShowReviewForm(false);
       setReviewForm({ rating: 5, comment: "" });
@@ -186,8 +172,6 @@ function TrainingDetailPage() {
 
   return (
     <div className="training-detail-page">
-
-      {/* ── Modal de paiement (conditionnel) ── */}
       {showPaymentModal && (
         <PaymentModal
           training={training}
@@ -196,20 +180,12 @@ function TrainingDetailPage() {
         />
       )}
 
-      {/* Header */}
+      {/* Le reste du JSX reste identique - inchangé */}
       <header className="detail-header">
         <div className="detail-header-content">
           <button className="back-btn" onClick={() => navigate("/trainings")}>
             ← Retour aux formations
           </button>
-          <div className="header-right">
-            <div className="student-profile">
-              <div className="avatar">
-                {profile?.firstName?.[0]}{profile?.lastName?.[0]}
-              </div>
-              <span>{profile?.firstName} {profile?.lastName}</span>
-            </div>
-          </div>
         </div>
       </header>
 
@@ -230,10 +206,8 @@ function TrainingDetailPage() {
             <span>⏱️ {training.duration} heures</span>
             <span>👥 {training.enrolledCount || 0} étudiants inscrits</span>
             <span>
-              ⭐ {stats.averageRating > 0 ? stats.averageRating.toFixed(1) : "Nouveau"}{" "}
-              ({stats.totalReviews} avis)
+              ⭐ {stats.averageRating > 0 ? stats.averageRating.toFixed(1) : "Nouveau"} ({stats.totalReviews} avis)
             </span>
-            {/* ── NOUVEAU : affichage du prix ── */}
             {isPaid && training.price && (
               <span style={{ fontWeight: "700", fontSize: "18px" }}>
                 💳 {training.price.toFixed(2)} MAD
@@ -256,16 +230,14 @@ function TrainingDetailPage() {
         </button>
       </div>
 
-      {/* Contenu */}
+      {/* Contenu - le reste reste identique à l'original */}
       <div className="detail-content">
-
-        {/* ── ONGLET APERÇU ── */}
+        {/* Overview Tab */}
         {activeTab === "overview" && (
           <div className="overview-section">
             <div className="card">
               <h2>À propos de cette formation</h2>
               <p>{training.description}</p>
-
               <div className="info-grid">
                 <div className="info-item">
                   <span className="info-icon">⏱️</span>
@@ -288,7 +260,6 @@ function TrainingDetailPage() {
                     <p>{isPaid ? "Payante" : "Gratuite"}</p>
                   </div>
                 </div>
-                {/* ── NOUVEAU : case Prix ── */}
                 {isPaid && (
                   <div className="info-item">
                     <span className="info-icon">💳</span>
@@ -306,26 +277,21 @@ function TrainingDetailPage() {
                   </div>
                 </div>
               </div>
-
               {!isEnrolled ? (
                 <button className="btn-enroll-large" onClick={handleEnroll}>
-                  {isPaid
-                    ? `💳 S'inscrire — ${training.price?.toFixed(2)} MAD`
-                    : "📝 S'inscrire gratuitement"}
+                  {isPaid ? `💳 S'inscrire — ${training.price?.toFixed(2)} MAD` : "📝 S'inscrire gratuitement"}
                 </button>
               ) : (
                 <div className="enrolled-message">
                   <span>✅ Vous êtes inscrit à cette formation</span>
-                  <button onClick={() => setActiveTab("resources")}>
-                    📁 Accéder aux ressources
-                  </button>
+                  <button onClick={() => setActiveTab("resources")}>📁 Accéder aux ressources</button>
                 </div>
               )}
             </div>
           </div>
         )}
 
-        {/* ── ONGLET RESSOURCES ── */}
+        {/* Resources Tab - inchangé */}
         {activeTab === "resources" && (
           <div className="resources-section">
             <div className="card">
@@ -371,7 +337,7 @@ function TrainingDetailPage() {
           </div>
         )}
 
-        {/* ── ONGLET AVIS ── */}
+        {/* Reviews Tab - inchangé */}
         {activeTab === "reviews" && (
           <div className="reviews-section">
             <div className="card">
@@ -401,7 +367,9 @@ function TrainingDetailPage() {
                       {[1, 2, 3, 4, 5].map((r) => (
                         <label key={r} className={`rating-option ${reviewForm.rating === r ? "selected" : ""}`}>
                           <input
-                            type="radio" name="rating" value={r}
+                            type="radio"
+                            name="rating"
+                            value={r}
                             checked={reviewForm.rating === r}
                             onChange={() => setReviewForm({ ...reviewForm, rating: r })}
                           />
@@ -459,7 +427,7 @@ function TrainingDetailPage() {
         )}
       </div>
 
-      {/* Styles (inchangés de l'original) */}
+       {/* Styles*/}
       <style jsx>{`
         .training-detail-page { min-height: 100vh; background: #f7f9fc; }
         .detail-header { background: white; border-bottom: 1px solid #e2e8f0; padding: 12px 32px; position: sticky; top: 0; z-index: 100; }

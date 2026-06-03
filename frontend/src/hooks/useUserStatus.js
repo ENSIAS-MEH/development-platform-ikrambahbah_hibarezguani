@@ -10,7 +10,7 @@ export const useUserStatus = (userId) => {
   const checkStatusViaApi = useCallback(async () => {
     if (!userId) return;
     try {
-      const response = await apiClient.get(`http://localhost:8086/api/users/${userId}/status`);
+      const response = await apiClient.get(`/api/users/${userId}/status`);
       setIsOnline(response.data.online);
     } catch (err) {
       console.warn(`Erreur vérification statut user ${userId}:`, err.message);

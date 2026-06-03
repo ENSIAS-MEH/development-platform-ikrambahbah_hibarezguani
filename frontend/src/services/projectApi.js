@@ -1,42 +1,42 @@
 import { apiClient } from "./authService";
 
-const BASE = "http://localhost:8085/api/projects";
+// Plus de BASE_URL, on utilise apiClient qui pointe vers Gateway
 
 // ─── Projects ──────────────────────────────────────────────────────────────
 export const getPublishedProjects = (page = 0, size = 12) =>
-  apiClient.get(`${BASE}?page=${page}&size=${size}`);
+  apiClient.get(`/api/projects?page=${page}&size=${size}`);
 
-export const getProject = (id) => apiClient.get(`${BASE}/${id}`);
+export const getProject = (id) => apiClient.get(`/api/projects/${id}`);
 
-export const getMyProjects = () => apiClient.get(`${BASE}/my`);
+export const getMyProjects = () => apiClient.get(`/api/projects/my`);
 
-export const createProject = (data) => apiClient.post(BASE, data);
+export const createProject = (data) => apiClient.post(`/api/projects`, data);
 
-export const publishProject = (id) => apiClient.patch(`${BASE}/${id}/publish`);
+export const publishProject = (id) => apiClient.patch(`/api/projects/${id}/publish`);
 
-export const archiveProject = (id) => apiClient.patch(`${BASE}/${id}/archive`);
+export const archiveProject = (id) => apiClient.patch(`/api/projects/${id}/archive`);
 
 // ─── Members ───────────────────────────────────────────────────────────────
 export const getMembers = (projectId) =>
-  apiClient.get(`${BASE}/${projectId}/members`);
+  apiClient.get(`/api/projects/${projectId}/members`);
 
 export const removeMember = (projectId, userId) =>
-  apiClient.delete(`${BASE}/${projectId}/members/${userId}`);
+  apiClient.delete(`/api/projects/${projectId}/members/${userId}`);
 
 // ─── Join Requests ─────────────────────────────────────────────────────────
 export const sendJoinRequest = (projectId, message) =>
-  apiClient.post(`${BASE}/${projectId}/join-requests`, { message });
+  apiClient.post(`/api/projects/${projectId}/join-requests`, { message });
 
 export const getJoinRequests = (projectId) =>
-  apiClient.get(`${BASE}/${projectId}/join-requests`);
+  apiClient.get(`/api/projects/${projectId}/join-requests`);
 
 export const approveRequest = (projectId, requestId) =>
-  apiClient.patch(`${BASE}/${projectId}/join-requests/${requestId}/approve`);
+  apiClient.patch(`/api/projects/${projectId}/join-requests/${requestId}/approve`);
 
 export const rejectRequest = (projectId, requestId) =>
-  apiClient.patch(`${BASE}/${projectId}/join-requests/${requestId}/reject`);
+  apiClient.patch(`/api/projects/${projectId}/join-requests/${requestId}/reject`);
 
-export const getMyRequests = () => apiClient.get(`${BASE}/my-requests`);
+export const getMyRequests = () => apiClient.get(`/api/projects/my-requests`);
 
 export const getProjectMembers = (projectId) =>
-  apiClient.get(`${BASE}/${projectId}/members`);
+  apiClient.get(`/api/projects/${projectId}/members`);

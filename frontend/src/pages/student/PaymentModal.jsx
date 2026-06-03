@@ -1,8 +1,6 @@
 // src/pages/student/PaymentModal.jsx
 import { useState } from "react";
-import axios from "axios";
-
-const API_URL = "http://localhost:8086/api/trainings";
+import { apiClient } from "../../services/authService";  // ✅ Utilise apiClient au lieu de axios
 
 /**
  * Modal de paiement simulé.
@@ -24,9 +22,7 @@ function PaymentModal({ training, onSuccess, onClose }) {
   const [result, setResult] = useState(null);
   const [errors, setErrors] = useState({});
 
-  const getAuthHeader = () => ({
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  });
+  // ✅ Plus besoin de getAuthHeader() car apiClient le fait automatiquement
 
   // ── Formatage automatique du numéro de carte (groupes de 4) ──
   const formatCardNumber = (value) => {
@@ -82,10 +78,11 @@ function PaymentModal({ training, onSuccess, onClose }) {
         currency: form.currency,
       };
 
-      const res = await axios.post(
-        `${API_URL}/${training.id}/enroll-paid`,
-        payload,
-        { headers: getAuthHeader() }
+      // ✅ Changement : utilise apiClient (pointe vers Gateway)
+      // ✅ Plus besoin de mettre les headers manuellement
+      const res = await apiClient.post(
+        `/api/trainings/${training.id}/enroll-paid`,
+        payload
       );
 
       setResult(res.data);
@@ -292,7 +289,7 @@ function PaymentModal({ training, onSuccess, onClose }) {
   );
 }
 
-// ── Styles inline ──
+// ── Styles inline (inchangés) ──
 const styles = {
   overlay: {
     position: "fixed", inset: 0,

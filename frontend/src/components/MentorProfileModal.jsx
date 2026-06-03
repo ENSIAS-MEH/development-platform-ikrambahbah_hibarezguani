@@ -1,8 +1,7 @@
 // src/components/MentorProfileModal.jsx
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { apiClient } from "../services/authService";
 
-const PROFILE_API = "http://localhost:8082/api/profiles";
 
 const MentorProfileModal = ({ isOpen, onClose, onProfileUpdated }) => {
   const [profile, setProfile] = useState(null);
@@ -17,13 +16,9 @@ const MentorProfileModal = ({ isOpen, onClose, onProfileUpdated }) => {
   });
   const [loading, setLoading] = useState(false);
 
-  const getAuthHeader = () => ({
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  });
-
   const fetchProfile = async () => {
     try {
-      const response = await axios.get(`${PROFILE_API}/me`, { headers: getAuthHeader() });
+      const response = await apiClient.get(`/api/profiles/me`);
       setProfile(response.data);
       setProfileForm({
         firstName: response.data.firstName || "",
@@ -41,22 +36,16 @@ const MentorProfileModal = ({ isOpen, onClose, onProfileUpdated }) => {
 
   const createProfile = async () => {
     const userId = localStorage.getItem("userId");
-    const response = await axios.post(
-      `${PROFILE_API}/me`,
-      {
-        authUserId: parseInt(userId),
-        firstName: profileForm.firstName,
-        lastName: profileForm.lastName,
-      },
-      { headers: getAuthHeader() }
-    );
+    const response = await apiClient.post(`/api/profiles/me`, {
+      authUserId: parseInt(userId),
+      firstName: profileForm.firstName,
+      lastName: profileForm.lastName,
+    });
     return response.data;
   };
 
   const updateProfile = async () => {
-    const response = await axios.put(`${PROFILE_API}/me`, profileForm, {
-      headers: getAuthHeader(),
-    });
+    const response = await apiClient.put(`/api/profiles/me`, profileForm);
     return response.data;
   };
 
@@ -97,7 +86,7 @@ const MentorProfileModal = ({ isOpen, onClose, onProfileUpdated }) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 9999,  // supérieur à la navbar (1000)
+        zIndex: 9999,
       }}
       onClick={onClose}
     >
@@ -148,7 +137,7 @@ const MentorProfileModal = ({ isOpen, onClose, onProfileUpdated }) => {
           </div>
         </div>
 
-        {/* Formulaire */}
+        {/* Formulaire - reste identique */}
         <form onSubmit={handleSubmit}>
           <div style={{ padding: "24px" }}>
             {/* Aperçu avatar */}
@@ -175,15 +164,7 @@ const MentorProfileModal = ({ isOpen, onClose, onProfileUpdated }) => {
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
               <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "13px",
-                    fontWeight: "600",
-                    color: "#334155",
-                    marginBottom: "6px",
-                  }}
-                >
+                <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#334155", marginBottom: "6px" }}>
                   Prénom
                 </label>
                 <input
@@ -201,15 +182,7 @@ const MentorProfileModal = ({ isOpen, onClose, onProfileUpdated }) => {
                 />
               </div>
               <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "13px",
-                    fontWeight: "600",
-                    color: "#334155",
-                    marginBottom: "6px",
-                  }}
-                >
+                <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#334155", marginBottom: "6px" }}>
                   Nom
                 </label>
                 <input
@@ -229,15 +202,7 @@ const MentorProfileModal = ({ isOpen, onClose, onProfileUpdated }) => {
             </div>
 
             <div style={{ marginBottom: "16px" }}>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: "13px",
-                  fontWeight: "600",
-                  color: "#334155",
-                  marginBottom: "6px",
-                }}
-              >
+              <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#334155", marginBottom: "6px" }}>
                 Bio professionnelle
               </label>
               <textarea
@@ -257,15 +222,7 @@ const MentorProfileModal = ({ isOpen, onClose, onProfileUpdated }) => {
             </div>
 
             <div style={{ marginBottom: "16px" }}>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: "13px",
-                  fontWeight: "600",
-                  color: "#334155",
-                  marginBottom: "6px",
-                }}
-              >
+              <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#334155", marginBottom: "6px" }}>
                 URL de l'avatar
               </label>
               <input
@@ -285,17 +242,7 @@ const MentorProfileModal = ({ isOpen, onClose, onProfileUpdated }) => {
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
               <div>
-                <label
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    fontSize: "13px",
-                    fontWeight: "600",
-                    color: "#334155",
-                    marginBottom: "6px",
-                  }}
-                >
+                <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: "600", color: "#334155", marginBottom: "6px" }}>
                   <span>🔗</span> LinkedIn
                 </label>
                 <input
@@ -313,17 +260,7 @@ const MentorProfileModal = ({ isOpen, onClose, onProfileUpdated }) => {
                 />
               </div>
               <div>
-                <label
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    fontSize: "13px",
-                    fontWeight: "600",
-                    color: "#334155",
-                    marginBottom: "6px",
-                  }}
-                >
+                <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: "600", color: "#334155", marginBottom: "6px" }}>
                   <span>🐙</span> GitHub
                 </label>
                 <input
@@ -343,17 +280,7 @@ const MentorProfileModal = ({ isOpen, onClose, onProfileUpdated }) => {
             </div>
 
             <div style={{ marginBottom: "16px" }}>
-              <label
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  fontSize: "13px",
-                  fontWeight: "600",
-                  color: "#334155",
-                  marginBottom: "6px",
-                }}
-              >
+              <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: "600", color: "#334155", marginBottom: "6px" }}>
                 <span>🌐</span> Site web
               </label>
               <input

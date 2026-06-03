@@ -1,7 +1,7 @@
 // src/components/messaging/ConversationItem.jsx
 import { useEffect, useState } from "react";
 import { getProfileByUserId } from "../../services/profileService";
-import { getUserInfo } from "../../services/userApi";
+import { getUserInfo } from "../../services/authService";
 import "./Messaging.css";
 
 export default function ConversationItem({ conversation, isActive, onClick }) {

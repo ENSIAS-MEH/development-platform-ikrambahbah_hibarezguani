@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getUserInfo } from "../../services/userApi";
+import { getUserInfo } from "../../services/authService";
 
 export default function ProjectCard({ project }) {
   const navigate = useNavigate();

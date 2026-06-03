@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import "./AuthStyles.css";
 
+const API_GATEWAY = "http://localhost:8080";
+
 function ResetPassword() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -42,7 +44,7 @@ function ResetPassword() {
     setIsLoading(true);
 
     try {
-      await axios.post("http://localhost:8084/api/auth/reset-password", {
+      await axios.post(`${API_GATEWAY}/api/auth/reset-password`, {
         token,
         newPassword,
       });

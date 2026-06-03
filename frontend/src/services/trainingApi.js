@@ -1,80 +1,64 @@
-// src/services/trainingApi.js
 import { apiClient } from "./authService";
 
-const BASE = "http://localhost:8087/api/trainings";
+// plus de BASE_URL
 
 // ═══════════════════════════════════════════════════════
 // FORMATIONS (CRUD + publication)
 // ═══════════════════════════════════════════════════════
 
-// Liste des formations publiées (étudiants)
 export const getPublishedTrainings = () =>
-  apiClient.get(BASE);
+  apiClient.get(`/api/trainings`);
 
-// Liste des formations du mentor connecté
 export const getMyTrainings = () =>
-  apiClient.get(`${BASE}/me`);
+  apiClient.get(`/api/trainings/me`);
 
-// Détail d'une formation
 export const getTrainingById = (id) =>
-  apiClient.get(`${BASE}/${id}`);
+  apiClient.get(`/api/trainings/${id}`);
 
-// Créer une formation (mentor)
 export const createTraining = (data) =>
-  apiClient.post(BASE, data);
+  apiClient.post(`/api/trainings`, data);
 
-// Mettre à jour une formation (mentor)
 export const updateTraining = (id, data) =>
-  apiClient.put(`${BASE}/${id}`, data);
+  apiClient.put(`/api/trainings/${id}`, data);
 
-// Supprimer une formation (mentor)
 export const deleteTraining = (id) =>
-  apiClient.delete(`${BASE}/${id}`);
+  apiClient.delete(`/api/trainings/${id}`);
 
-// Publier une formation (brouillon → publiée)
 export const publishTraining = (id) =>
-  apiClient.post(`${BASE}/${id}/publish`);
+  apiClient.post(`/api/trainings/${id}/publish`);
 
 // ═══════════════════════════════════════════════════════
-// INSCRIPTIONS (étudiant)
+// INSCRIPTIONS
 // ═══════════════════════════════════════════════════════
 
-// Inscription gratuite
 export const enrollFreeTraining = (trainingId) =>
-  apiClient.post(`${BASE}/${trainingId}/enroll`);
+  apiClient.post(`/api/trainings/${trainingId}/enroll`);
 
-// Inscription payante (avec simulation de paiement)
 export const enrollPaidTraining = (trainingId, paymentData) =>
-  apiClient.post(`${BASE}/${trainingId}/enroll-paid`, paymentData);
+  apiClient.post(`/api/trainings/${trainingId}/enroll-paid`, paymentData);
 
-// Récupérer les formations auxquelles l'étudiant est inscrit
 export const getMyEnrollments = () =>
-  apiClient.get(`${BASE}/my-enrollments`);
+  apiClient.get(`/api/trainings/my-enrollments`);
 
 // ═══════════════════════════════════════════════════════
-// RESSOURCES PÉDAGOGIQUES (mentor)
+// RESSOURCES
 // ═══════════════════════════════════════════════════════
 
-// Récupérer les ressources d'une formation
 export const getTrainingResources = (trainingId) =>
-  apiClient.get(`${BASE}/${trainingId}/resources`);
+  apiClient.get(`/api/trainings/${trainingId}/resources`);
 
-// Ajouter une ressource
 export const addResource = (trainingId, data) =>
-  apiClient.post(`${BASE}/${trainingId}/resources`, data);
+  apiClient.post(`/api/trainings/${trainingId}/resources`, data);
 
-// Supprimer une ressource
 export const deleteResource = (resourceId) =>
-  apiClient.delete(`${BASE}/resources/${resourceId}`);
+  apiClient.delete(`/api/trainings/resources/${resourceId}`);
 
 // ═══════════════════════════════════════════════════════
-// AVIS / NOTES (étudiant)
+// AVIS / NOTES
 // ═══════════════════════════════════════════════════════
 
-// Récupérer les avis d'une formation
 export const getTrainingReviews = (trainingId) =>
-  apiClient.get(`${BASE}/${trainingId}/reviews`);
+  apiClient.get(`/api/trainings/${trainingId}/reviews`);
 
-// Ajouter un avis (étudiant inscrit)
 export const addReview = (trainingId, data) =>
-  apiClient.post(`${BASE}/${trainingId}/reviews`, data);
+  apiClient.post(`/api/trainings/${trainingId}/reviews`, data);

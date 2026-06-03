@@ -1,95 +1,67 @@
 // src/services/profileService.js
 import axios from "axios";
+import { apiClient } from "./authService";
 
-const API_URL = "http://localhost:8082/api/profiles";
-
-const getAuthHeader = () => ({
-  Authorization: `Bearer ${localStorage.getItem("token")}`,
-});
+// Utilise apiClient qui pointe déjà vers le Gateway
+// Plus besoin de API_URL séparée
 
 // ========== PROFIL ==========
 export const getProfile = async () => {
-  const response = await axios.get(`${API_URL}/me`, {
-    headers: getAuthHeader(),
-  });
+  const response = await apiClient.get(`/api/profiles/me`);
   return response.data;
 };
 
 export const createProfile = async (data) => {
-  const response = await axios.post(`${API_URL}/me`, data, {
-    headers: getAuthHeader(),
-  });
+  const response = await apiClient.post(`/api/profiles/me`, data);
   return response.data;
 };
 
 export const updateProfile = async (data) => {
-  const response = await axios.put(`${API_URL}/me`, data, {
-    headers: getAuthHeader(),
-  });
+  const response = await apiClient.put(`/api/profiles/me`, data);
   return response.data;
 };
 
 // ========== SKILLS ==========
 export const addSkill = async (data) => {
-  const response = await axios.post(`${API_URL}/me/skills`, data, {
-    headers: getAuthHeader(),
-  });
+  const response = await apiClient.post(`/api/profiles/me/skills`, data);
   return response.data;
 };
 
 export const deleteSkill = async (skillId) => {
-  await axios.delete(`${API_URL}/skills/${skillId}`, {
-    headers: getAuthHeader(),
-  });
+  await apiClient.delete(`/api/profiles/skills/${skillId}`);
 };
 
 // ========== EXPERIENCES ==========
 export const addExperience = async (data) => {
-  const response = await axios.post(`${API_URL}/me/experiences`, data, {
-    headers: getAuthHeader(),
-  });
+  const response = await apiClient.post(`/api/profiles/me/experiences`, data);
   return response.data;
 };
 
-// ✅ AJOUTER cette fonction pour modifier une expérience
 export const updateExperience = async (experienceId, data) => {
-  const response = await axios.put(`${API_URL}/me/experiences/${experienceId}`, data, {
-    headers: getAuthHeader(),
-  });
+  const response = await apiClient.put(`/api/profiles/me/experiences/${experienceId}`, data);
   return response.data;
 };
 
 export const deleteExperience = async (experienceId) => {
-  await axios.delete(`${API_URL}/me/experiences/${experienceId}`, {
-    headers: getAuthHeader(),
-  });
+  await apiClient.delete(`/api/profiles/me/experiences/${experienceId}`);
 };
 
 // ========== EDUCATIONS ==========
 export const addEducation = async (data) => {
-  const response = await axios.post(`${API_URL}/me/educations`, data, {
-    headers: getAuthHeader(),
-  });
+  const response = await apiClient.post(`/api/profiles/me/educations`, data);
   return response.data;
 };
 
 export const deleteEducation = async (educationId) => {
-  await axios.delete(`${API_URL}/me/educations/${educationId}`, {
-    headers: getAuthHeader(),
-  });
+  await apiClient.delete(`/api/profiles/me/educations/${educationId}`);
 };
 
-
 // ========== PROFIL PAR USER ID ==========
-// Récupérer le profil d'un utilisateur par son ID
 export const getProfileByUserId = async (userId) => {
-  const response = await axios.get(`${API_URL}/users/${userId}`, {
-    headers: getAuthHeader(),
-  });
+  const response = await apiClient.get(`/api/profiles/users/${userId}`);
   return response.data;
 };
 
-// Récupérer plusieurs profils en une fois (optimisé)
 export const getMultipleProfiles = async (userIds) => {
   if (!userIds || userIds.length === 0) return {};
   

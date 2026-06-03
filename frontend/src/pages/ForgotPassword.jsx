@@ -2,6 +2,8 @@ import { useState } from "react";
 import axios from "axios";
 import "./AuthStyles.css";
 
+const API_GATEWAY = "http://localhost:8080";
+
 function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -14,7 +16,7 @@ function ForgotPassword() {
     setIsLoading(true);
 
     try {
-      await axios.post("http://localhost:8084/api/auth/forgot-password", { email });
+      await axios.post(`${API_GATEWAY}/api/auth/forgot-password`, { email });
       setSent(true);
       setMessageType("success");
       setMessage("Un email de réinitialisation a été envoyé si ce compte existe ✅");

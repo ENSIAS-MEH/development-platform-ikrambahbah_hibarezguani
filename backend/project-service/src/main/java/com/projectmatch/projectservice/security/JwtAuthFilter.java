@@ -1,4 +1,4 @@
-package com.projectmatch.projectservice.security;
+package com.projectmatch.messagingservice.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -29,13 +29,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     FilterChain chain)
             throws ServletException, IOException {
 
-        // ✅ AJOUT : Ignorer les requêtes OPTIONS (preflight CORS)
+        // ✅ MODIFICATION : Supprimer l'ajout manuel des headers CORS
+        // L'API Gateway gère déjà le CORS
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
-            response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-            response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
-            response.setHeader("Access-Control-Allow-Headers", "*");
-            response.setHeader("Access-Control-Allow-Credentials", "true");
             chain.doFilter(request, response);
             return;
         }
@@ -51,9 +48,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         .parseClaimsJws(token)
                         .getBody();
 
-                String email = claims.getSubject();
-                String role  = claims.get("role", String.class);
+                String email  = claims.getSubject();
+                String role   = claims.get("role", String.class);
                 Long userId   = claims.get("userId", Long.class);
+
                 request.setAttribute("userId", userId);
                 request.setAttribute("email", email);
 

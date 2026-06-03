@@ -1,0 +1,76 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      # ✅ Garde globalcors pour les API REST
+      globalcors:
+        cors-configurations:
+          '[/api/**]':  # ← Limiter aux routes API uniquement
+            allowedOrigins:
+              - "http://localhost:3000"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+      routes:
+        - id: auth-service
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=0
+
+        - id: projet-service
+          uri: lb://PROJET-SERVICE
+          predicates:
+            - Path=/api/projects/**
+          filters:
+            - StripPrefix=0
+
+        - id: profile-service
+          uri: lb://PROFILE-SERVICE
+          predicates:
+            - Path=/api/profiles/**
+          filters:
+            - StripPrefix=0
+
+        - id: messaging-service
+          uri: lb://MESSAGING-SERVICE
+          predicates:
+            - Path=/api/conversations/**,/api/messages/**,/api/users/**,/api/uploads/**
+          filters:
+            - StripPrefix=0
+
+        # ✅ Route séparée pour WebSocket (sans CORS)
+        - id: websocket
+          uri: lb://MESSAGING-SERVICE
+          predicates:
+            - Path=/ws-messaging/**
+          filters:
+            - StripPrefix=0
+
+        - id: training-service
+          uri: lb://TRAINING-SERVICE
+          predicates:
+            - Path=/api/trainings/**
+          filters:
+            - StripPrefix=0
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

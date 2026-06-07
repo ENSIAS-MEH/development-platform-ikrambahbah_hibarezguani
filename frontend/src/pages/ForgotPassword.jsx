@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import "./AuthStyles.css";
 
-const API_GATEWAY = "http://localhost:8080";
+const API_GATEWAY = "http://localhost:30080";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");

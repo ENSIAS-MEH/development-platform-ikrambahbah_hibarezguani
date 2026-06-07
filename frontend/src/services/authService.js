@@ -1,7 +1,7 @@
 // src/services/authService.js
 import axios from "axios";
 
-const API_GATEWAY_URL = "http://localhost:8080";
+const API_GATEWAY_URL = "http://localhost:30080";
 
 // ─── Instance Axios avec intercepteur JWT ──────────────────────────────────
 export const apiClient = axios.create({
@@ -18,7 +18,7 @@ apiClient.interceptors.request.use((config) => {
 
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {  // ← ICI : ajouter "=>"
+  (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("role");
@@ -54,9 +54,9 @@ export const getUserInfo = async (userId) => {
 // Récupérer plusieurs utilisateurs en une fois
 export const getMultipleUsers = async (userIds) => {
   if (!userIds || userIds.length === 0) return {};
-  
+
   const uniqueIds = [...new Set(userIds)];
-  const promises = uniqueIds.map(id => 
+  const promises = uniqueIds.map(id =>
     getUserInfo(id).catch(() => ({ data: { email: `Utilisateur ${id}` } }))
   );
   const results = await Promise.all(promises);

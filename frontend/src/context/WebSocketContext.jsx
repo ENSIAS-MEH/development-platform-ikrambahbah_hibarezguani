@@ -15,8 +15,7 @@ import SockJS from "sockjs-client";
 import { useAuth } from "./AuthContext";
 import { markAllAsDelivered } from "../services/messagingApi";
 
-const WS_URL = "http://localhost:8080/ws-messaging";
-
+const WS_URL = "http://localhost:30080/ws-messaging";
 const WebSocketContext = createContext(null);
 
 export function WebSocketProvider({ children }) {

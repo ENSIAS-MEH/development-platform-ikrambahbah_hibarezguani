@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: training-service
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: training-service
+
+  template:
+    metadata:
+      labels:
+        app: training-service
+
+    spec:
+      containers:
+        - name: training-service
+          image: training-service:v2
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8087
+          env:
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: "http://discovery-service:8761/eureka/"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: training-service
+
+spec:
+  selector:
+    app: training-service
+
+  ports:
+    - protocol: TCP
+      port: 8087
+      targetPort: 8087

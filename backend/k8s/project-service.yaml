@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project-service
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: project-service
+
+  template:
+    metadata:
+      labels:
+        app: project-service
+
+    spec:
+      containers:
+        - name: project-service
+          image: project-service:test
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8085
+          env:
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: "http://discovery-service:8761/eureka/"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: project-service
+
+spec:
+  selector:
+    app: project-service
+
+  ports:
+    - protocol: TCP
+      port: 8085
+      targetPort: 8085

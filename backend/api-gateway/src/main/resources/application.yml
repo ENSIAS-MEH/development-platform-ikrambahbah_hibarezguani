@@ -4,18 +4,23 @@ server:
 spring:
   application:
     name: api-gateway
+
   cloud:
     gateway:
       discovery:
         locator:
           enabled: true
           lower-case-service-id: true
-      # ✅ Garde globalcors pour les API REST
+
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+
       globalcors:
         cors-configurations:
-          '[/api/**]':  # ← Limiter aux routes API uniquement
+          '[/**]':
             allowedOrigins:
               - "http://localhost:3000"
+              - "http://localhost:30090"
             allowedMethods:
               - GET
               - POST
@@ -26,51 +31,66 @@ spring:
             allowedHeaders: "*"
             allowCredentials: true
             maxAge: 3600
+
       routes:
+
         - id: auth-service
-          uri: lb://AUTH-SERVICE
+          uri: http://auth-service:8084
           predicates:
             - Path=/api/auth/**
           filters:
             - StripPrefix=0
 
-        - id: projet-service
-          uri: lb://PROJET-SERVICE
+        - id: project-service
+          uri: http://project-service:8085
           predicates:
             - Path=/api/projects/**
           filters:
             - StripPrefix=0
 
         - id: profile-service
-          uri: lb://PROFILE-SERVICE
+          uri: http://profile-service:8082
           predicates:
             - Path=/api/profiles/**
           filters:
             - StripPrefix=0
 
         - id: messaging-service
-          uri: lb://MESSAGING-SERVICE
+          uri: http://messaging-service:8086
           predicates:
             - Path=/api/conversations/**,/api/messages/**,/api/users/**,/api/uploads/**
           filters:
             - StripPrefix=0
 
-        # ✅ Route séparée pour WebSocket (sans CORS)
         - id: websocket
-          uri: lb://MESSAGING-SERVICE
+          uri: ws://messaging-service:8086
           predicates:
             - Path=/ws-messaging/**
           filters:
             - StripPrefix=0
 
         - id: training-service
-          uri: lb://TRAINING-SERVICE
+          uri: http://training-service:8087
           predicates:
             - Path=/api/trainings/**
           filters:
             - StripPrefix=0
 
 eureka:
+  instance:
+    prefer-ip-address: true
+
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://discovery-service:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    reactor.netty: INFO

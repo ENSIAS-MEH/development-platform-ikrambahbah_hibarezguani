@@ -1,4 +1,4 @@
-package com.projectmatch.messagingservice.security;
+package com.projectmatch.projectservice.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

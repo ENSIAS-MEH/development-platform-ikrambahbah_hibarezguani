@@ -56,19 +56,6 @@ Le mentor est une personne expérimentée qui accompagne les jeunes dans leurs p
 
 ---
 
-### 2.3 Administrateur
-
-L'administrateur est responsable de la gestion et du bon fonctionnement de la plateforme.
-
-**Il peut :**
-
-- Gérer les utilisateurs
-- Supprimer les contenus inappropriés
-- Gérer les projets publiés
-- Contrôler la sécurité de la plateforme
-
----
-
 ## Architecture
 
 ```

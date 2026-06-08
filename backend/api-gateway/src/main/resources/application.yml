@@ -1,0 +1,96 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:3000"
+              - "http://localhost:30090"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
+      routes:
+
+        - id: auth-service
+          uri: http://auth-service:8084
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=0
+
+        - id: project-service
+          uri: http://project-service:8085
+          predicates:
+            - Path=/api/projects/**
+          filters:
+            - StripPrefix=0
+
+        - id: profile-service
+          uri: http://profile-service:8082
+          predicates:
+            - Path=/api/profiles/**
+          filters:
+            - StripPrefix=0
+
+        - id: messaging-service
+          uri: http://messaging-service:8086
+          predicates:
+            - Path=/api/conversations/**,/api/messages/**,/api/users/**,/api/uploads/**
+          filters:
+            - StripPrefix=0
+
+        - id: websocket
+          uri: ws://messaging-service:8086
+          predicates:
+            - Path=/ws-messaging/**
+          filters:
+            - StripPrefix=0
+
+        - id: training-service
+          uri: http://training-service:8087
+          predicates:
+            - Path=/api/trainings/**
+          filters:
+            - StripPrefix=0
+
+eureka:
+  instance:
+    prefer-ip-address: true
+
+  client:
+    service-url:
+      defaultZone: http://discovery-service:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    reactor.netty: INFO
